@@ -1,0 +1,14 @@
+* text=auto
+*.adoc text
+*.bazel text
+*.bzl text
+*.cc text
+*.h text
+*.json text
+*.patch text
+*.proto text
+*.yaml text
+BUILD text
+*.bat text eol=crlf
+*.bin filter=lfs diff=lfs merge=lfs -text
+*.png filter=lfs diff=lfs merge=lfs -text

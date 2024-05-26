@@ -1,0 +1,14 @@
+.*
+!/.bazelignore
+!/.bazelrc
+!/.bazelversion
+!/.clang-format
+!/.envrc
+!/.gitattributes
+!/.github/
+!/.gitignore
+!/.yamlfmt
+!/.yamllint
+/bazel-*
+/bin/
+/user.bazelrc

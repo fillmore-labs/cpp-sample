@@ -1,0 +1,36 @@
+---
+name: Coverage
+"on":
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  test:
+    name: Coverage
+    runs-on: ubuntu-24.04
+    permissions:
+      checks: write
+      contents: read
+      pull-requests: read
+      statuses: write
+    steps:
+      - name: ✔ Check out
+        uses: actions/checkout@v4
+      - name: 🌿 Set up Bazel
+        uses: bazel-contrib/setup-bazel@0.8.4
+        with:
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
+      - name: 🛌 Coverage
+        run: |
+          bazel coverage --instrumentation_filter='/lib[/:],/lib_alt[/:]' --combined_report=lcov //test/...
+          echo "COVERAGE_REPORT=$(bazel info output_path)/_coverage/_coverage_report.dat" >> "$GITHUB_ENV"
+      - name: 🧑🏻‍💻 codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ${{ env.COVERAGE_REPORT }}
+          token: ${{ secrets.CODECOV_TOKEN }}

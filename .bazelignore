@@ -1,0 +1,7 @@
+.buildkite
+.git
+.github
+.idea
+.ijwb
+.vscode
+bin

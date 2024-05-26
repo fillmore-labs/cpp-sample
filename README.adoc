@@ -1,0 +1,105 @@
+= Fillmore Labs C++ Sample
+:Author:    Oliver Eikemeier
+:Email:     <eikemeier@fillmore-labs.com>
+:Date:      2024-05
+:Revision:  v0.3
+:toc: macro
+
+image:https://github.com/fillmore-labs/cpp-sample/actions/workflows/test.yml/badge.svg?branch=main[Test,link=https://github.com/fillmore-labs/cpp-sample/actions/workflows/test.yml]
+image:https://codecov.io/gh/fillmore-labs/cpp-sample/graph/badge.svg?token=ZP6GH9YVEL[Coverage,link=https://codecov.io/gh/fillmore-labs/cpp-sample]
+image:https://img.shields.io/github/license/fillmore-labs/cpp-sample[License,link=https://www.apache.org/licenses/LICENSE-2.0]
+
+Experiment in setting up a C++ build pipeline.
+
+toc::[]
+
+== Purpose
+
+This code is a simple
+https://blog.codinghorror.com/why-cant-programmers-program/[FizzBuzz]
+implementation, to play around with a
+https://en.wikipedia.org/wiki/C%2B%2B17[C++17] build pipeline.
+
+== Running
+
+=== Prerequisites
+
+You need https://github.com/bazelbuild/bazelisk[Bazelisk] installed, with https://brew.sh[HomeBrew]
+just use [source,shell]`brew install bazelisk`.
+
+=== Tests
+
+To run all tests, use
+
+[source,shell]
+bazel test //test/...
+
+=== Main App
+
+Run the app with
+
+[source,shell]
+bazel run //main:cpp-sample
+
+or, for the alternate strategy (same result):
+
+[source,shell]
+bazel run //main:cpp-sample-alt
+
+=== Dependency Inversion Principle
+
+This code demonstrates the application of the
+https://en.wikipedia.org/wiki/Dependency_inversion_principle[dependency inversion principle].
+Naively, one would simply make the main programm dependent on the concrete implementation of the
+transformation strategy. Here, we simply let the main programm own the interface, making it
+independent of the implementation and therefore the strategy exchangable.
+
+[subs="quotes"]
+.Dependencies of `//main:main`
+----
+*bazel query 'filter("^//", kind("source file", deps(//main:main)))'*
+_//main:fizzbuzz.h_
+_//main:main.cc_
+----
+
+Then, to put everything together, link:main/cpp-sample.cc[`cpp-sample.cc`] or
+link:main/cpp-sample-alt.cc[`cpp-sample-alt.cc`] pull in the concrete implementaion making a
+runnable application:
+
+[subs="quotes"]
+.Dependencies of `//main:cpp-sample`
+----
+*bazel query 'filter("^//", kind("source file", deps(//main:cpp-sample)))'*
+_//lib:fizzbuzz.cc_
+_//main:fizzbuzz.h_
+_//main:main.cc_
+----
+
+[subs="quotes"]
+.Dependencies of `//main:cpp-sample-alt`
+----
+*bazel query 'filter("^//", kind("source file", deps(//main:cpp-sample-alt)))'*
+_//lib_alt:fizzbuzz.cc_
+_//main:fizzbuzz.h_
+_//main:main.cc_
+----
+
+The tests work the same way:
+
+[subs="quotes"]
+.Dependencies of `//test:fizzbuzz-test`
+----
+*bazel query 'filter("^//", kind("source file", deps(//test:fizzbuzz-test)))'*
+_//lib:fizzbuzz.cc_
+_//main:fizzbuzz.h_
+_//test:fizzbuzz-test.cc_
+----
+
+[subs="quotes"]
+.Dependencies of `//test:fizzbuzz-test-alt`
+----
+*bazel query 'filter("^//", kind("source file", deps(//test:fizzbuzz-test-alt)))'*
+_//lib_alt:fizzbuzz.cc_
+_//main:fizzbuzz.h_
+_//test:fizzbuzz-test.cc_
+----
